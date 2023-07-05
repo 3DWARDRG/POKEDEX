@@ -1,0 +1,18 @@
+{
+  "name": "ls",
+  "version": "1.0.0",
+  "description": "proyecto pokedex dependencias",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "#pokemon",
+    "#pokedex"
+  ],
+  "author": "EdwardRG",
+  "license": "MIT",
+  "dependencies": {
+    "bootstrap": "^5.3.0"
+  }
+}
