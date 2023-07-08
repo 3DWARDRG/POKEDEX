@@ -1,102 +1,91 @@
 
-console.log("suscríbete y comparte ❤");
+let offset=0;
+const limit=10;
+const limitPokemons=1260;
 
-// https://developer.mozilla.org/es/docs/Web/JavaScript/Referencia/Objetos_globales/Math/random
-function getRandomInt(min, max) {
-  return Math.floor(Math.random() * (max - min)) + min;
+
+const contentCard=document.querySelector('#content-card')
+const loadMoreButton = document.querySelector('#loadMoreButton')
+
+const pokeFuncions={};
+
+
+
+pokeFuncions.getPokemons=(offset, limit) => {
+
+  const url=`https://pokeapi.co/api/v2/pokemon?limit=${limit}&offset=${offset}}`;
+
+  return fetch(url)
+  .then(response => response.json())
+  .then(data=> data.results)
+  .then(pokemons => pokemons.map(pokeFuncions.getPokemonDetail))
+  .then((detailRequests) => Promise.all(detailRequests))
+  .then((pokemonsDetails) => pokemonsDetails)
+  .catch(error => {
+    console.error('Error:', error);
+  });
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  const ramdom = getRandomInt(1, 152);
-  fetchData(ramdom);
-});
 
-const fetchData = async (id) => {
-  try {
-    console.log(id);
+pokeFuncions.getPokemonDetail = (pokemon) => {
+  return fetch(pokemon.url)
+      .then((response) => response.json())
+      .then(ObteneryAsignarValores)
+}
 
-    const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`);
-    const data = await res.json();
+function ObteneryAsignarValores(pokeDetail){
+    const pokemon = new Pokemon()
+    pokemon.number = pokeDetail.id
+    pokemon.name = pokeDetail.name
 
-    console.log(data);
+    const types = pokeDetail.types.map((typeSlot) => typeSlot.type.name)
+    const [type] = types
 
-    const pokemon = {
-      img: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${data.id}.png`,
-      imgJuego: data.sprites.front_default,
-      imgCvg: data.sprites.other.dream_world.front_default,
-      nombre: data.name,
-      experiencia: data.base_experience,
-      hp: data.stats[0].base_stat,
-      ataque: data.stats[1].base_stat,
-      defensa: data.stats[2].base_stat,
-      especial: data.stats[3].base_stat,
-    };
+    pokemon.types = types
+    pokemon.type = type
 
-    pintarCard(pokemon);
-  } catch (error) {
-    console.log(error);
+    pokemon.photo = pokeDetail['sprites']['versions']['generation-v']['black-white']['animated']['front_default'];
+
+    return pokemon
+}
+
+
+//Insertar cartas en el DOM
+
+function loadPokemonItens(offset, limit) {
+  pokeFuncions.getPokemons(offset, limit).then((pokemons = []) => {
+      const newHtml = pokemons.map(createCard).join('')
+      contentCard.innerHTML += newHtml
+  })
+}
+
+loadPokemonItens(offset, limit)
+
+
+loadMoreButton.addEventListener('click', () => {
+  offset += limit
+  const qtdRecordsWithNexPage = offset + limit
+
+  if (qtdRecordsWithNexPage >= limitPokemons) {
+      const newLimit = limitPokemons - offset
+      loadPokemonItens(offset, newLimit)
+
+      loadMoreButton.parentElement.removeChild(loadMoreButton)
+  } else {
+      loadPokemonItens(offset, limit)
   }
-};
-
-const pintarCard = (pokemon) => {
-  const flex = document.querySelector(".flex");
-  const template = document.getElementById("card").content;
-  const clone = template.cloneNode(true);
-  const fragment = document.createDocumentFragment();
-
-  clone.querySelector(".card-body-img").setAttribute("src", pokemon.imgCvg);
-  // clone.querySelector('.card-body-img').setAttribute('src', pokemon.imgJuego)
-  clone.querySelector(
-    ".card-body-title"
-  ).innerHTML = `${pokemon.nombre} <span>${pokemon.hp}hp</span>`;
-  clone.querySelector(".card-body-text").textContent =
-    pokemon.experiencia + " exp";
-  clone.querySelectorAll(".card-footer-social h3")[0].textContent =
-    pokemon.ataque + "K";
-  clone.querySelectorAll(".card-footer-social h3")[1].textContent =
-    pokemon.especial + "K";
-  clone.querySelectorAll(".card-footer-social h3")[2].textContent =
-    pokemon.defensa + "K";
-
-  fragment.appendChild(clone);
-  flex.appendChild(fragment);
-};
+})
 
 
 
-
-
-
-// const URL= "https://pokeapi.co/api/v2/pokemon/?offset=0&limit=100";
-
-
-
-
-
-
-
-// const pokemones=async() => {
-//     let resultado= await obtenerDatos();
-//     return resultado;
-// } 
-
-// console.log(pokemones)
-
-
-
-// let p= document.querySelector(".p");
-
-
-
-
-
-
-
-
-//  function obtenerDatos(){
-// fetch(URL)
-// .then(resp=>resp.json())
-// .then(resp=>console.log(resp))
-// .catch(error=>console.log("error"))
-
-// }
+function createCard(pokemon){
+  return  `  <div class="card" style="width: 18rem;">
+  <img src="${pokemon.photo}" class="card-img-top" alt="${pokemon.name}">
+  <div class="card-body">
+    <p class="card-text">${pokemon.name}</p>
+    <ol class="types">
+                    ${pokemon.types.map((type) => `<li class="type ${type}">${type}</li>`).join('')}
+                </ol>
+  </div>
+</div>`
+}

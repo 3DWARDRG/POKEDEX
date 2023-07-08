@@ -5,44 +5,44 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <script defer src="./js/main.js"></script>
-    <link rel="stylesheet" href="styles.css">
+    <script defer src="./node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script defe src="./js/pokemon-class.js"></script>
+    <link rel="stylesheet" href="./css/index.css">
 </head>
 <body>
-    <main class="flex"></main>
-    <template id="card">
-      <article class="card">
-        <img
-          src="./images/bg-pattern-card.svg"
-          alt="imagen header card"
-          class="card-header"
-        />
-        <div class="card-body">
-          <img
-            src="./images/image-victor.jpg"
-            alt="imagen de vitoko"
-            class="card-body-img"
-          />
-          <h1 class="card-body-title">
-            Victor charst
-            <span>26</span>
-          </h1>
-          <p class="card-body-text">London</p>
+  <header>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="#">P0KEDEX</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav">
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="#">Inicio</a>
+            </li>
+          </ul>
         </div>
-        <div class="card-footer">
-          <div class="card-footer-social">
-            <h3>80K</h3>
-            <p>Ataque</p>
-          </div>
-          <div class="card-footer-social">
-            <h3>803K</h3>
-            <p>Ataque Especial</p>
-          </div>
-          <div class="card-footer-social">
-            <h3>1.4K</h3>
-            <p>Defensa</p>
-          </div>
-        </div>
-      </article>
-    </template>
+      </div>
+      <div class="container-fluid w-100">
+        <form class="d-flex w-100" role="search">
+          <input class="form-control me-2" type="search" placeholder="Buscar" aria-label="Buscar">
+          <button class="btn btn-outline-success" type="submit">Buscar</button>
+        </form>
+      </div>
+    </nav>
+  </header>
+  <main  class="p-5">
+    <section id="content-card">
+    </section>
+    <section>
+      <div class="pagination">
+        <button id="loadMoreButton" type="button">
+            Load More
+        </button>
+    </div>
+    </section>
+  </main>
 </body>
 </html>
