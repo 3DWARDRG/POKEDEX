@@ -9,28 +9,56 @@ const search= document.querySelector('#search')
 const contentBottom=document.querySelector('.pagination');
 const contentElements=document.querySelector('#contentElements');
 
+
+document.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("spinner").style.display = "block";
+  console.log('funciona')
+});
+
+// Oculta el spinner cuando todos los elementos hayan terminado de cargarse
+window.addEventListener("load", () => {
+  // document.getElementById("spinner").style.display = "none";
+    document.getElementById("spinner").style.display = "none";
+; // Retraso de 3 segundos
+});
+
+
 const pokeFuncions={};
+
+// Evento para buscar pokemons en la NavBar.
 
 
 search.addEventListener('submit',(a) =>{
 
-a.preventDefault()
+  a.preventDefault()
 
- const name=document.querySelector('#input-search').value;
+  document.getElementById("spinner").style.display = "block";
 
+ const name=document.querySelector('#input-search').value.toLowerCase();
+console.log(name)
 
- contentCard.innerHTML = '';
+contentCard.innerHTML = '';
 contentBottom.innerHTML = '';
 
-loadPokemon(name,createCard)
+loadPokemon(name,createCard,contentCard)
+
+loadContent(contentCard, () => {
+  // Oculta el spinner una vez que el contenido haya terminado de cargarse
+  document.getElementById("spinner").style.display = "none";
+});
 
 })
 
-
-async function watchResults(data){
-
-  const newHTML=await data
-  console.log(newHTML)
+function loadContent(div, callback) {
+  // Simula una carga lenta del contenido
+    // Agrega contenido al div
+    setTimeout(function() {
+      // Agrega contenido al div
+      console.log(div +"contenido cargado")
+  
+      // Llama al callback para indicar que el contenido ha terminado de cargarse
+      callback();
+    }, 3000);
 }
 
 
@@ -50,13 +78,6 @@ pokeFuncions.getPokemon=(name) => {
 }
 
 
-function loadPokemon(name,createCard) {
-
-      pokeFuncions.getPokemon(name).then((pokemons) => {
-        const newHtml = createCard(pokemons)
-        contentCard.innerHTML += newHtml
-  })
-}
 
 
 
@@ -102,14 +123,114 @@ pokeFuncions.getPokemons=(offset, limit) => {
 
 //Insertar cartas en el DOM
 
-function loadPokemonItens(offset, limit) {
-  pokeFuncions.getPokemons(offset, limit).then((pokemons = []) => {
+
+
+async function loadPokemonItens(offset, limit) {
+   let pokemons=[]
+    pokemons=await pokeFuncions.getPokemons(offset, limit)
+
       const newHtml = pokemons.map(createCard).join('')
       contentCard.innerHTML += newHtml
-  })
+
+      const cards=document.querySelectorAll('#cards');
+
+      console.log(cards)
+
+    cards.forEach(pruebaidea2);
+    console.log('Después del forEach');
+      
 }
 
+function pruebaidea2(card){
+
+      card.addEventListener('click', () => {
+
+
+      const specificChildElement = card.querySelector('.card-text');
+      let textoDelPokemon=specificChildElement.textContent;
+
+      console.log(textoDelPokemon)
+
+      pokeFuncions.getPokemon(textoDelPokemon).then(pokemon => { 
+        
+        const newHtml = createModal(pokemon)
+        var newElement = document.createElement('div');
+        newElement.innerHTML = newHtml;
+        contentElements.appendChild(newElement)
+        
+        let myModal = document.querySelector('#exampleModal');
+        console.log(myModal)
+       let modal = new bootstrap.Modal(myModal);
+       modal.show();
+
+       myModal.addEventListener('hidden.bs.modal', function () {
+        myModal.remove();
+      });
+        ;})
+
+
+
+
+    //   pokeFuncions.getPokemon(textoDelPokemon).then(pokemon => {
+    //   const newHtml = createModal(pokemon)
+    //   contentElements.innerHTML += newHtml
+    //   console.log('si funciona')
+    // }).catch((err)=>console.log('ERROR'))
+      // loadPokemon(textoDelPokemon,createCard,contentCard);
+      // loadPokemon(`${textoDelPokemon}`,createModal,contentElements)
+      console.log(textoDelPokemon);
+
+
+
+
+      })
+
+}
+
+// function pruebaFuncion(callback,arg1,arg2,arg3){
+
+//   console.log('haber')
+//   callback(arg1,arg2,arg3)
+//   console.log('se ejecuto el callback')
+
+// }
+
+// Insertar una sola carta o modal al DOM
+
+function loadPokemon(name,createCard,contentCard) {
+    pokeFuncions.getPokemon(name).then(pokemon => {
+      const newHtml = createCard(pokemon)
+      contentCard.innerHTML += newHtml
+      console.log('si funciona')
+      const cards=document.querySelectorAll('#cards');
+
+      console.log(cards)
+    cards.forEach(pruebaidea2);
+    })
+
+}
+
+// loadPokemonItens(offset, limit)
 loadPokemonItens(offset, limit)
+
+
+// loadPokemon(textoDelPokemon,createModal,contentElements)
+  
+// const myModal = document.querySelector('#exampleModal')
+// console.log('funciona')
+// console.log(myModal)
+
+
+
+// async function miFuncion() {
+//       await 
+
+
+
+//     }
+
+
+// miFuncion()
 
 
 loadMoreButton.addEventListener('click', () => {
@@ -122,14 +243,16 @@ loadMoreButton.addEventListener('click', () => {
 
       loadMoreButton.parentElement.removeChild(loadMoreButton)
   } else {
+
       loadPokemonItens(offset, limit)
+
   }
 })
 
 
 
 function createCard(pokemon){
-  return  `  <div class="card" style="width: 18rem;">
+  return  `  <div id="cards" class="card" style="width: 18rem;">
   <img src="${pokemon.photo}" onerror="this.src='${pokemon.photo2}'" class="card-img-top" alt="${pokemon.name}">
   <div class="card-body">
     <p class="card-text">${pokemon.name}</p>
@@ -140,12 +263,13 @@ function createCard(pokemon){
 </div>`
 }
 
+
 function createModal(pokemon){
-  return ` <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  return ` <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="false">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">${pokemon.id}</h5>
+        <h5 class="modal-title" id="exampleModalLabel">${pokemon.name}</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
@@ -154,10 +278,6 @@ function createModal(pokemon){
     <ol class="types">
                     ${pokemon.types.map((type) => `<li class="type ${type}">${type}</li>`).join('')}
                 </ol>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-        <button type="button" class="btn btn-primary">Guardar cambios</button>
       </div>
     </div>
   </div>
