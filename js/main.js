@@ -1,26 +1,13 @@
 
 let offset=0;
-const limit=10;
+const limit=12;
 const limitPokemons=1010;
 
-const contentCard=document.querySelector('#content-card')
+const contentCard=document.querySelectorAll('#content-card')
 const loadMoreButton = document.querySelector('#loadMoreButton')
 const search= document.querySelector('#search')
-const contentBottom=document.querySelector('.pagination');
-const contentElements=document.querySelector('#contentElements');
-
-
-document.addEventListener("DOMContentLoaded", () => {
-  document.getElementById("spinner").style.display = "block";
-  console.log('funciona')
-});
-
-// Oculta el spinner cuando todos los elementos hayan terminado de cargarse
-window.addEventListener("load", () => {
-  // document.getElementById("spinner").style.display = "none";
-    document.getElementById("spinner").style.display = "none";
-; // Retraso de 3 segundos
-});
+const contentBottom= document.querySelector('.pagination');
+const contentElements= document.querySelector('#contentElements');
 
 
 const pokeFuncions={};
@@ -32,34 +19,26 @@ search.addEventListener('submit',(a) =>{
 
   a.preventDefault()
 
-  document.getElementById("spinner").style.display = "block";
-
  const name=document.querySelector('#input-search').value.toLowerCase();
 console.log(name)
 
+const cards=document.querySelectorAll('#cards')
+
+for (let i = 0; i < cards.length; i++) {
+    cards[i].remove();
+}
+
 contentCard.innerHTML = '';
+
+console.log(cards)
 contentBottom.innerHTML = '';
 
-loadPokemon(name,createCard,contentCard)
 
-loadContent(contentCard, () => {
-  // Oculta el spinner una vez que el contenido haya terminado de cargarse
-  document.getElementById("spinner").style.display = "none";
-});
+
+loadPokemon(name)
+
 
 })
-
-function loadContent(div, callback) {
-  // Simula una carga lenta del contenido
-    // Agrega contenido al div
-    setTimeout(function() {
-      // Agrega contenido al div
-      console.log(div +"contenido cargado")
-  
-      // Llama al callback para indicar que el contenido ha terminado de cargarse
-      callback();
-    }, 3000);
-}
 
 
 // pokeFuncions.getPokemons(offset, limit).then((pokemons = []) => {
@@ -118,6 +97,7 @@ pokeFuncions.getPokemons=(offset, limit) => {
   .then((pokemonsDetails) => pokemonsDetails)
   .catch(error => {
     console.error('Error:', error);
+    location.reload()
   });
 }
 
@@ -126,11 +106,47 @@ pokeFuncions.getPokemons=(offset, limit) => {
 
 
 async function loadPokemonItens(offset, limit) {
-   let pokemons=[]
+
+  try{
+
+    let pokemons=[]
     pokemons=await pokeFuncions.getPokemons(offset, limit)
 
-      const newHtml = pokemons.map(createCard).join('')
-      contentCard.innerHTML += newHtml
+    console.log(pokemons)
+
+      const newHtml =pokemons.map(createCard)
+      console.log(typeof(newHtml))
+      console.log(newHtml.length)
+
+      console.log('prueba 106')
+      // console.log(contentCard.length)
+
+      let prueba=0;
+
+      for(let i=0;i<newHtml.length;i++){
+
+        // contentCard[i].innerHTML=newHtml[prueba];
+
+
+
+        if(prueba<=2){
+            contentCard[prueba].innerHTML+=newHtml[i]
+        }
+        else{
+          prueba=0
+
+          contentCard[prueba].innerHTML+=newHtml[i]
+        }
+        prueba+=1;
+        // prueba+=ss
+
+        // console.log(newHtml[prueba])
+
+        console.log(prueba)
+
+      }
+
+      
 
       const cards=document.querySelectorAll('#cards');
 
@@ -138,6 +154,13 @@ async function loadPokemonItens(offset, limit) {
 
     cards.forEach(pruebaidea2);
     console.log('Después del forEach');
+  }
+
+  catch (error){
+    console.log('la cagaste mi rey', error)
+
+  }
+
       
 }
 
@@ -147,14 +170,16 @@ function pruebaidea2(card){
 
 
       const specificChildElement = card.querySelector('.card-text');
-      let textoDelPokemon=specificChildElement.textContent;
+      let textoDelPokemon=specificChildElement.textContent.match(/[a-zA-Z]/g);
+      let resultado=textoDelPokemon.join('');
+      let a=resultado.toLowerCase()
 
-      console.log(textoDelPokemon)
+      console.log(a)
 
-      pokeFuncions.getPokemon(textoDelPokemon).then(pokemon => { 
+      pokeFuncions.getPokemon(a).then(pokemon => { 
         
         const newHtml = createModal(pokemon)
-        var newElement = document.createElement('div');
+        let newElement = document.createElement('div');
         newElement.innerHTML = newHtml;
         contentElements.appendChild(newElement)
         
@@ -178,7 +203,7 @@ function pruebaidea2(card){
     // }).catch((err)=>console.log('ERROR'))
       // loadPokemon(textoDelPokemon,createCard,contentCard);
       // loadPokemon(`${textoDelPokemon}`,createModal,contentElements)
-      console.log(textoDelPokemon);
+      console.log(a);
 
 
 
@@ -197,13 +222,12 @@ function pruebaidea2(card){
 
 // Insertar una sola carta o modal al DOM
 
-function loadPokemon(name,createCard,contentCard) {
+function loadPokemon(name) {
     pokeFuncions.getPokemon(name).then(pokemon => {
       const newHtml = createCard(pokemon)
-      contentCard.innerHTML += newHtml
+      contentCard[1].innerHTML += newHtml
       console.log('si funciona')
       const cards=document.querySelectorAll('#cards');
-
       console.log(cards)
     cards.forEach(pruebaidea2);
     })
@@ -255,9 +279,9 @@ function createCard(pokemon){
   return  `  <div id="cards" class="card" style="width: 18rem;">
   <img src="${pokemon.photo}" onerror="this.src='${pokemon.photo2}'" class="card-img-top" alt="${pokemon.name}">
   <div class="card-body">
-    <p class="card-text">${pokemon.name}</p>
+    <p class="card-text">#${pokemon.number}${' '}${pokemon.name.toUpperCase()}</p>
     <ol class="types">
-                    ${pokemon.types.map((type) => `<li class="type ${type}">${type}</li>`).join('')}
+                    ${pokemon.types.map((type) => `<li class="type ${type}">${type.toUpperCase()}</li>`).join('')}
                 </ol>
   </div>
 </div>`
