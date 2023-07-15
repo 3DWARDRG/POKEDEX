@@ -52,6 +52,7 @@ pokeFuncions.getPokemon=(name) => {
   return fetch(url)
   .then(response => response.json())
   .then(data => data)
+  // .then(promis=>console.log(promis))
   .then(ObteneryAsignarValores)
   .catch(err => console.error('No se encontro el elemento', name, err))
 }
@@ -76,6 +77,15 @@ function ObteneryAsignarValores(pokeDetail){
 
     pokemon.types = types
     pokemon.type = type
+
+    pokemon.Hp = pokeDetail.stats[0].base_stat;
+    pokemon.statAttack =pokeDetail.stats[1].base_stat;
+    pokemon.statDefense =pokeDetail.stats[2].base_stat;
+    pokemon.statSpeed =pokeDetail.stats[5].base_stat;
+    
+
+    pokemon.height =pokeDetail.height;
+    pokemon.weight =pokeDetail.weight;
 
     pokemon.photo = pokeDetail['sprites']['other']['dream_world']['front_default'];
     pokemon.photo2 = pokeDetail['sprites']['front_default']
@@ -170,7 +180,7 @@ function pruebaidea2(card){
 
 
       const specificChildElement = card.querySelector('.card-text');
-      let textoDelPokemon=specificChildElement.textContent.match(/[a-zA-Z]/g);
+      let textoDelPokemon=specificChildElement.textContent.match(/[a-zA-Z-]/g);
       let resultado=textoDelPokemon.join('');
       let a=resultado.toLowerCase()
 
@@ -290,18 +300,61 @@ function createCard(pokemon){
 
 function createModal(pokemon){
   return ` <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="false">
-  <div class="modal-dialog">
+  <div class="modal-dialog modal-xl">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">${pokemon.name}</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
+      <div class="pokeInfoGeneral">
       <img src="${pokemon.photo}" onerror="this.src='${pokemon.photo2}'" class="card-img-top" alt="${pokemon.name}">
-      <p class="card-text">${pokemon.name}</p>
-    <ol class="types">
-                    ${pokemon.types.map((type) => `<li class="type ${type}">${type}</li>`).join('')}
-                </ol>
+      <p class="card-text">${pokemon.name.toUpperCase()}</p>
+      <ol class="types">
+      ${pokemon.types.map((type) => `<li class="type ${type}">${type.toUpperCase()}</li>`).join('')}
+  </ol>
+      </div>
+      <div class="pokeInfoSpecific">
+      <h3>Information Fisic</h3>
+      <div class="pokeInfo">
+      <div class="box-fisic">
+      <div class="box-items-fisic">
+      <p class='title-items-fisic'>HEIGHT</p>
+      <p>${pokemon.height}</p>
+      </div>
+      <div class="box-items-fisic">
+      <p class='title-items-fisic'>WEIGHT</p>
+      <p>${pokemon.weight}</p>
+      </div>
+      </div>
+      <h3>Stats</h3>
+      <div class="box-stats">
+      <div class="box-bar">
+      <p>HP</p>
+      <div class="progress">
+      <div class="progress-bar" role="progressbar" style="width: ${pokemon.Hp}%;" aria-valuenow="${pokemon.Hp}" aria-valuemin="0" aria-valuemax="250">${pokemon.Hp}%</div>
+      </div>  
+      </div>
+      <div class="box-bar">
+      <p>ATTACK</p>
+      <div class="progress">
+      <div class="progress-bar" role="progressbar" style="width: ${pokemon.statAttack}%;" aria-valuenow="${pokemon.statAttack}" aria-valuemin="0" aria-valuemax="250">${pokemon.statAttack}%</div>
+      </div>  
+      </div>
+      <div class="box-bar">
+      <p>DEFENSE</p>
+      <div class="progress">
+      <div class="progress-bar" role="progressbar" style="width: ${pokemon.statDefense}%;" aria-valuenow="${pokemon.statDefense}" aria-valuemin="0" aria-valuemax="250">${pokemon.statDefense}%</div>
+      </div>  
+      </div>
+      <div class="box-bar">
+      <p>SPEED</p>
+      <div class="progress">
+      <div class="progress-bar" role="progressbar" style="width: ${pokemon.statSpeed}%;" aria-valuenow="${pokemon.statSpeed}" aria-valuemin="0" aria-valuemax="250">${pokemon.statSpeed}%</div>
+      </div>  
+      </div>
+      </div>
+                </div>
+                </div>
       </div>
     </div>
   </div>
