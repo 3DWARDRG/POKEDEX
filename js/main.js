@@ -1,50 +1,26 @@
-
+// Estas variables limitan los pokemones por cada call a la API y el numero total de pokemons 
 let offset=0;
 const limit=12;
-const limitPokemons=1010;
+const totalPokemons=1010;
 
+
+// Elemeneto padre para insertar cartas Pokemon 
 const contentCard=document.querySelectorAll('#content-card')
+// Contenedor padre del boton More Pokemons
+const contentButtonLoadMore=document.querySelector('.pagination')
+// Boton para ver mas Carts Pokemon
 const loadMoreButton = document.querySelector('#loadMoreButton')
+  // Formulario para hacer usar el addEventListener
 const search= document.querySelector('#search')
-const contentBottom= document.querySelector('.pagination');
+// Contenedor padre de cartas y demas elementos
 const contentElements= document.querySelector('#contentElements');
 
 
+
+// Objeto para guardar funciones de manera mas organizada
 const pokeFuncions={};
 
-// Evento para buscar pokemons en la NavBar.
-
-
-search.addEventListener('submit',(a) =>{
-
-  a.preventDefault()
-
- const name=document.querySelector('#input-search').value.toLowerCase();
-console.log(name)
-
-const cards=document.querySelectorAll('#cards')
-
-for (let i = 0; i < cards.length; i++) {
-    cards[i].remove();
-}
-
-contentCard.innerHTML = '';
-
-console.log(cards)
-contentBottom.innerHTML = '';
-
-
-
-loadPokemon(name)
-
-
-})
-
-
-// pokeFuncions.getPokemons(offset, limit).then((pokemons = []) => {
-//   const newHtml = pokemons.map(createCard).join('')
-//   contentCard.innerHTML += newHtml
-
+// Funcion para convertir data en una clase pokemon
 pokeFuncions.getPokemon=(name) => {
 
   const url=`https://pokeapi.co/api/v2/pokemon/${name}`;
@@ -52,22 +28,37 @@ pokeFuncions.getPokemon=(name) => {
   return fetch(url)
   .then(response => response.json())
   .then(data => data)
-  // .then(promis=>console.log(promis))
-  .then(ObteneryAsignarValores)
+  .then(getAndAssignValues)
   .catch(err => console.error('No se encontro el elemento', name, err))
 }
 
+// Funcion/metodo para solicitar data de varios pokemons en un rango establecido
+pokeFuncions.getPokemons=(offset, limit) => {
 
+  const url=`https://pokeapi.co/api/v2/pokemon?limit=${limit}&offset=${offset}}`;
 
+  return fetch(url)
+  .then(response => response.json())
+  .then(data=> data.results)
+  .then(pokemons => pokemons.map(pokeFuncions.getPokemonDetail))
+  .then((detailRequests) => Promise.all(detailRequests))
+  .then((pokemonsDetails) => pokemonsDetails)
+  .catch(error => {
+    console.error('Error:', error);
+    location.reload()
+  });
+}
 
-
+// Funcion/metodo para solicitar data de un conjunto de pokemons
 pokeFuncions.getPokemonDetail = (pokemon) => {
   return fetch(pokemon.url)
       .then((response) => response.json())
-      .then(ObteneryAsignarValores)
+      .then(getAndAssignValues)
 }
 
-function ObteneryAsignarValores(pokeDetail){
+
+// Funcion para convertir data.json a una clase mas facil de manipular
+function getAndAssignValues(pokeDetail){
     const pokemon = new Pokemon()
     pokemon.number = pokeDetail.id
     pokemon.name = pokeDetail.name
@@ -89,31 +80,13 @@ function ObteneryAsignarValores(pokeDetail){
 
     pokemon.photo = pokeDetail['sprites']['other']['dream_world']['front_default'];
     pokemon.photo2 = pokeDetail['sprites']['front_default']
+    pokemon.photoA = pokeDetail['sprites']['versions']['generation-v']['black-white']['animated']['front_default'];
 
     return pokemon
 }
 
 
-
-pokeFuncions.getPokemons=(offset, limit) => {
-
-  const url=`https://pokeapi.co/api/v2/pokemon?limit=${limit}&offset=${offset}}`;
-
-  return fetch(url)
-  .then(response => response.json())
-  .then(data=> data.results)
-  .then(pokemons => pokemons.map(pokeFuncions.getPokemonDetail))
-  .then((detailRequests) => Promise.all(detailRequests))
-  .then((pokemonsDetails) => pokemonsDetails)
-  .catch(error => {
-    console.error('Error:', error);
-    location.reload()
-  });
-}
-
 //Insertar cartas en el DOM
-
-
 
 async function loadPokemonItens(offset, limit) {
 
@@ -122,48 +95,29 @@ async function loadPokemonItens(offset, limit) {
     let pokemons=[]
     pokemons=await pokeFuncions.getPokemons(offset, limit)
 
-    console.log(pokemons)
+      const structureCards =pokemons.map(createCard)
 
-      const newHtml =pokemons.map(createCard)
-      console.log(typeof(newHtml))
-      console.log(newHtml.length)
+      let traveledValue=0;
 
-      console.log('prueba 106')
-      // console.log(contentCard.length)
+      // Este ciclo for lo cree para recorrer columna por columna e ir ubicando las cartas Why? Bootstrap Framework
 
-      let prueba=0;
+      for(let i=0;i<structureCards.length;i++){
 
-      for(let i=0;i<newHtml.length;i++){
-
-        // contentCard[i].innerHTML=newHtml[prueba];
-
-
-
-        if(prueba<=2){
-            contentCard[prueba].innerHTML+=newHtml[i]
+        if(traveledValue<=2){
+            contentCard[traveledValue].innerHTML+=structureCards[i]
         }
         else{
-          prueba=0
+          traveledValue=0
 
-          contentCard[prueba].innerHTML+=newHtml[i]
+          contentCard[traveledValue].innerHTML+=structureCards[i]
         }
-        prueba+=1;
-        // prueba+=ss
-
-        // console.log(newHtml[prueba])
-
-        console.log(prueba)
+        traveledValue+=1;
 
       }
 
-      
-
       const cards=document.querySelectorAll('#cards');
-
-      console.log(cards)
-
-    cards.forEach(pruebaidea2);
-    console.log('Después del forEach');
+      // Ejecuto en cada elemento con un forEach una funcion para crear un modal con la informacion del pokemon
+    cards.forEach(activeModalPokemon);
   }
 
   catch (error){
@@ -174,121 +128,55 @@ async function loadPokemonItens(offset, limit) {
       
 }
 
-function pruebaidea2(card){
+
+// Creamos el modal con la informacion obtenida al hacer click en una carta pokemon
+function activeModalPokemon(card){
 
       card.addEventListener('click', () => {
 
 
-      const specificChildElement = card.querySelector('.card-text');
-      let textoDelPokemon=specificChildElement.textContent.match(/[a-zA-Z-]/g);
-      let resultado=textoDelPokemon.join('');
-      let a=resultado.toLowerCase()
+      const specificTextCard = card.querySelector('.card-text');
+      let extractOnlyLetters=specificTextCard.textContent.match(/[a-zA-Z-]/g);
+      let convertlettersToStrings=extractOnlyLetters.join('');
+      let textCardValue=convertlettersToStrings.toLowerCase()
 
-      console.log(a)
-
-      pokeFuncions.getPokemon(a).then(pokemon => { 
+      pokeFuncions.getPokemon(textCardValue).then(pokemon => { 
         
-        const newHtml = createModal(pokemon)
-        let newElement = document.createElement('div');
-        newElement.innerHTML = newHtml;
-        contentElements.appendChild(newElement)
+        const structureModal = createModal(pokemon)
+        let newDivForReplace = document.createElement('div');
+        newDivForReplace.innerHTML = structureModal;
+        contentElements.appendChild(newDivForReplace)
         
-        let myModal = document.querySelector('#exampleModal');
-        console.log(myModal)
-       let modal = new bootstrap.Modal(myModal);
-       modal.show();
+        let myModalPokemon = document.querySelector('#pokemonModal');
+        let modalBootstrap = new bootstrap.Modal(myModalPokemon);
+        modalBootstrap.show();
 
-       myModal.addEventListener('hidden.bs.modal', function () {
-        myModal.remove();
+        myModalPokemon.addEventListener('hidden.bs.modal', function () {
+        myModalPokemon.remove();
       });
         ;})
-
-
-
-
-    //   pokeFuncions.getPokemon(textoDelPokemon).then(pokemon => {
-    //   const newHtml = createModal(pokemon)
-    //   contentElements.innerHTML += newHtml
-    //   console.log('si funciona')
-    // }).catch((err)=>console.log('ERROR'))
-      // loadPokemon(textoDelPokemon,createCard,contentCard);
-      // loadPokemon(`${textoDelPokemon}`,createModal,contentElements)
-      console.log(a);
-
-
-
-
       })
 
 }
-
-// function pruebaFuncion(callback,arg1,arg2,arg3){
-
-//   console.log('haber')
-//   callback(arg1,arg2,arg3)
-//   console.log('se ejecuto el callback')
-
-// }
 
 // Insertar una sola carta o modal al DOM
 
 function loadPokemon(name) {
     pokeFuncions.getPokemon(name).then(pokemon => {
-      const newHtml = createCard(pokemon)
-      contentCard[1].innerHTML += newHtml
-      console.log('si funciona')
+      const structureCard = createCard(pokemon)
+      contentCard[1].innerHTML += structureCard
       const cards=document.querySelectorAll('#cards');
-      console.log(cards)
-    cards.forEach(pruebaidea2);
+    cards.forEach(activeModalPokemon);
     })
 
 }
 
-// loadPokemonItens(offset, limit)
-loadPokemonItens(offset, limit)
 
-
-// loadPokemon(textoDelPokemon,createModal,contentElements)
-  
-// const myModal = document.querySelector('#exampleModal')
-// console.log('funciona')
-// console.log(myModal)
-
-
-
-// async function miFuncion() {
-//       await 
-
-
-
-//     }
-
-
-// miFuncion()
-
-
-loadMoreButton.addEventListener('click', () => {
-  offset += limit
-  const qtdRecordsWithNexPage = offset + limit
-
-  if (qtdRecordsWithNexPage >= limitPokemons) {
-      const newLimit = limitPokemons - offset
-      loadPokemonItens(offset, newLimit)
-
-      loadMoreButton.parentElement.removeChild(loadMoreButton)
-  } else {
-
-      loadPokemonItens(offset, limit)
-
-  }
-})
-
-
-
+// Creamos y asignamos valores a la estructura de la carta Pokemon
 function createCard(pokemon){
   return  `  <div id="cards" class="card" style="width: 18rem;">
-  <img src="${pokemon.photo}" onerror="this.src='${pokemon.photo2}'" class="card-img-top" alt="${pokemon.name}">
   <div class="card-body">
+  <img src="${pokemon.photo}" onerror="this.src='${pokemon.photo2}'" class="card-img-top" alt="${pokemon.name}">
     <p class="card-text">#${pokemon.number}${' '}${pokemon.name.toUpperCase()}</p>
     <ol class="types">
                     ${pokemon.types.map((type) => `<li class="type ${type}">${type.toUpperCase()}</li>`).join('')}
@@ -297,9 +185,9 @@ function createCard(pokemon){
 </div>`
 }
 
-
+// Creamos y asignamos valores a la estructura del Modal Pokemon
 function createModal(pokemon){
-  return ` <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="false">
+  return ` <div class="modal fade" id="pokemonModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="false">
   <div class="modal-dialog modal-xl">
     <div class="modal-content">
       <div class="modal-header">
@@ -315,7 +203,6 @@ function createModal(pokemon){
       </div>
       <div class="pokeInfoSpecific">
       <h3>Information Fisic</h3>
-      <div class="pokeInfo">
       <div class="box-fisic">
       <div class="box-items-fisic">
       <p class='title-items-fisic'>HEIGHT</p>
@@ -354,9 +241,53 @@ function createModal(pokemon){
       </div>
       </div>
                 </div>
-                </div>
       </div>
     </div>
   </div>
 </div>`
 }
+
+// Arrow funcion para establecer el limite de pokemons para solictar a la API
+loadMoreButton.addEventListener('click', () => {
+  offset += limit
+  const limitPokemons = offset + limit
+
+  if (limitPokemons >= totalPokemons) {
+      const newLimit = totalPokemons - offset
+      loadPokemonItens(offset, newLimit)
+
+      loadMoreButton.parentElement.removeChild(loadMoreButton)
+  } else {
+
+      loadPokemonItens(offset, limit)
+
+  }
+})
+
+// Evento para buscar pokemons en la NavBar.
+search.addEventListener('submit',(stopRedirectionDefault) =>{
+
+  stopRedirectionDefault.preventDefault()
+
+
+// Valor ingresado en la barra de busqueda
+ const name=document.querySelector('#input-search').value.toLowerCase();
+
+const cards=document.querySelectorAll('#cards')
+// Remueve todas las cartas 
+for (let i = 0; i < cards.length; i++) {
+    cards[i].remove();
+}
+
+
+contentButtonLoadMore.innerHTML = '';
+
+
+// Ejecutamos la funcion que nos devuelve la carta del pokemon con el valor del input
+loadPokemon(name)
+
+
+})
+
+// Call y insercion de Cartas Pokemon
+loadPokemonItens(offset, limit)
