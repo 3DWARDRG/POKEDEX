@@ -81,6 +81,17 @@
     }
 
 
+    #box-nav-bar {
+        background-image: url("./images/background-nav-bar.png");
+        background-position: center;
+      }
+      
+      #logo-image {
+        width: 50%;
+        height: 50%;
+      }
+
+
 
 body{
         font-family: 'VT323', sans-serif;
@@ -150,12 +161,8 @@ img{
 
 .pokeInfoSpecific{
     width: 50%;
+    box-sizing: border-box;
 }
-
-.pokeInfo{
-    height: 90%;
-}
-
 
 h3{
     height: 10%;
@@ -195,7 +202,7 @@ h3{
 }
 
 .box-stats{
-    height: 40%;
+    height: 30%;
 }
 
 
@@ -208,8 +215,42 @@ h3{
 .box-bar p{
     width: 10%;
     margin: 0;
+    text-align: center;
 }
 
 .progress{
     width: 90%;
+}
+
+.pagination {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 6rem;
+    padding: 1rem;
+}
+
+.pagination button {
+    padding: .25rem .5rem;
+    margin: .25rem 0;
+    font-size: 1.5rem;
+    color: #000000;
+    background-color: #ffffff;
+    border: none;
+    border-radius: 1rem;
+    width: 20%;
+    height: 100%;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+}
+
+.textImportant{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.textImportant p{
+    font-size: 2rem;
 }
