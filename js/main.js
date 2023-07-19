@@ -103,16 +103,24 @@ async function loadPokemonItens(offset, limit) {
 
       for(let i=0;i<structureCards.length;i++){
 
-        if(traveledValue<=2){
+
+        if( traveledValue<contentCard.length){
             contentCard[traveledValue].innerHTML+=structureCards[i]
-        }
-        else{
-          traveledValue=0
+            traveledValue++;
 
-          contentCard[traveledValue].innerHTML+=structureCards[i]
+            console.log(traveledValue)
         }
-        traveledValue+=1;
 
+        else {
+          traveledValue = 0;
+          contentCard[traveledValue].innerHTML += structureCards[i];
+          traveledValue++;
+          console.log(traveledValue);
+        }
+
+
+        
+        
       }
 
       const cards=document.querySelectorAll('#cards');
