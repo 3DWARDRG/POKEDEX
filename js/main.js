@@ -14,6 +14,7 @@ const loadMoreButton = document.querySelector('#loadMoreButton')
 const search= document.querySelector('#search')
 // Contenedor padre de cartas y demas elementos
 const contentElements= document.querySelector('#contentElements');
+// Contenedor footer
 
 
 
@@ -175,7 +176,11 @@ function loadPokemon(name) {
       contentCard[1].innerHTML += structureCard
       const cards=document.querySelectorAll('#cards');
     cards.forEach(activeModalPokemon);
-    })
+    contentButtonLoadMore.innerHTML = '';
+    contentButtonLoadMore.removeAttribute("style");
+    contentButtonLoadMore.setAttribute('style', 'height: 0; padding:0');
+    
+    }).catch(noExisteEsePuchamon())
 
 }
 
@@ -293,9 +298,22 @@ contentButtonLoadMore.innerHTML = '';
 
 // Ejecutamos la funcion que nos devuelve la carta del pokemon con el valor del input
 loadPokemon(name)
-
-
 })
 
 // Call y insercion de Cartas Pokemon
 loadPokemonItens(offset, limit)
+
+
+function noExisteEsePuchamon(){
+
+  const name=document.querySelector('#input-search').value.toLowerCase();
+
+  const a=`
+  <div class="box-error">
+    <p class='text-error'>No existe el puchamon "${name}".Intenta de nuevo con un nombre valido.</p>
+</div>`
+
+contentButtonLoadMore.innerHTML=a;
+
+contentButtonLoadMore.setAttribute('style', 'margin-bottom: 20rem');
+}
