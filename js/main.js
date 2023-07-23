@@ -180,7 +180,7 @@ function loadPokemon(name) {
     contentButtonLoadMore.removeAttribute("style");
     contentButtonLoadMore.setAttribute('style', 'height: 0; padding:0');
     
-    }).catch(noExisteEsePuchamon())
+    }).catch(noExistThisPokemon())
 
 }
 
@@ -303,8 +303,8 @@ loadPokemon(name)
 // Call y insercion de Cartas Pokemon
 loadPokemonItens(offset, limit)
 
-
-function noExisteEsePuchamon(){
+// Funcion creada para manejar el error de no encontrar un pokemon en la API
+function noExistThisPokemon(){
 
   const name=document.querySelector('#input-search').value.toLowerCase();
 
